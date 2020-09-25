@@ -7,11 +7,11 @@ import Operation from './components/Operation';
 export default function App() {
   const [result,setResult] = useState(0);
   const inputValue = (value) => {
-    if(value.toString().length > 10){
-      setResult(value.toExponential(4))
-    } else {
+    // if(value.toString().length > 10){
+    //   setResult(value.toExponential(4))
+    // } else {
       setResult(value);
-    };
+    // };
   }
   return (
     <View style={styles.container}>
@@ -23,7 +23,6 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flex: 1
   },
 });

@@ -5,79 +5,89 @@ import ButtonCal from './ButtonCal';
 
 const Operation = (props) => {
     const [value, setValue] = useState(0);
-    const [preValue, setPreValue] = useState(0);
     const [symbol, setSymbol] = useState(null);
     const [point, setPoint] = useState(false);
+
     const inputHandle = (input) => {
-        switch(typeof parseInt(input)) {
+        switch(typeof input) {
             case 'number':
-                if(point){
-                    if(symbol == '=' || symbol == '%' || symbol == '.'){
-                        setValue(Number.isNaN(parseFloat(input))? value : parseFloat(input));
-                        setSymbol(null);
+                setValue((value + input).toString());
+                setSymbol(null);
+                if(symbol == '=' || symbol == '%'){
+                    if( (value.toString().indexOf('+') == -1) && 
+                        (value.toString().indexOf('*') == -1) &&
+                        (value.toString().indexOf('/') == -1) &&
+                        ((value.toString().indexOf('-') == 0) || (value.toString().indexOf('-') == -1))){
+                            setValue(input);
                     } else {
-                    setValue(parseFloat(value + input));};
-                } else {
-                    if(symbol == '=' || symbol == '%'){
-                        setValue(Number.isNaN(parseFloat(input))? value : parseFloat(input));
-                        setSymbol(null);
-                    } else {
-                        if(value < 0){
-                            setValue((value * 10.0) - parseFloat(input));
-                        } else {
-                            setValue((value * 10.0) + parseFloat(input));
-                        };
-                    };
-                }
+                        setValue((value + input).toString());
+                    }
+                };
             default:
                 return inputStringHandle(input);
-        }
+        };
     };
     const inputStringHandle = (input) => {
         switch(input) {
             case 'AC':
                 setSymbol(null);
-                setPreValue(0);
                 setValue(0);
                 setPoint(false);
                 break;
             case '+/-':
-                setValue(value * (-1));
+                if(value == 0){
+                    setValue(eval(value)*(-1));
+                } else {
+                    setValue(String(eval(value)*(-1)));
+                };
                 break;
             case '%':
-                setValue(value/100);
-                setSymbol(input);
-                setPoint(false);
+                if(value == 0){
+                    setValue(eval(value)/100);
+                } else {
+                    if(!symbol){
+                        setValue(String(eval(value)/100));
+                        setSymbol(input);
+                    } else {
+                        setValue(value);
+                        setSymbol(input);
+                    };
+                };
                 break;
             case '.':
-                if(!point){
-                    setValue(value.toString().concat('.'));
-                    setPoint(true);
-                } else {
+                if(!symbol && !point){
+                    setValue((value + input).toString());
                     setSymbol(input);
-                }
+                    setPoint(true);
+                };
                 break;
             case '/':
             case '*':
             case '-':
             case '+':
-                setSymbol(input);
-                setPreValue(parseFloat(value));
-                setValue(0);
-                setPoint(false);
+                if(!symbol || symbol == '=' || symbol == '%'){
+                    setValue((value + input).toString());
+                    setSymbol(input);
+                    setPoint(false);
+                } else {
+                    setValue(value);
+                    setSymbol(input);
+                }
                 break;
             case '=':
-                setPreValue(0);
-                setValue((symbol == '='||symbol == '%'||symbol == '.')? value :eval(preValue + symbol + value));
-                setSymbol('=');
-                setPoint(false);
+                if(!symbol){
+                    setValue(String(eval(value)));
+                    setSymbol(input);
+                } else {
+                    setValue(value);
+                    setSymbol(input);
+                }
                 break;
         }
     };
 
     useEffect(() => {
         props.display(value);
-        setPoint((value.toString().indexOf('.') == -1) ? false: true);
     });
 
     return(
@@ -90,22 +100,22 @@ const Operation = (props) => {
           </View>
           <View style={styles.numbers}>
             <View style={styles.row}>
-              <ButtonCal value={7} onPress={inputHandle.bind(this, '7')}></ButtonCal>
-              <ButtonCal value={8} onPress={inputHandle.bind(this, '8')}></ButtonCal>
-              <ButtonCal value={9} onPress={inputHandle.bind(this, '9')}></ButtonCal>
+              <ButtonCal value={7} onPress={inputHandle.bind(this, 7)}></ButtonCal>
+              <ButtonCal value={8} onPress={inputHandle.bind(this, 8)}></ButtonCal>
+              <ButtonCal value={9} onPress={inputHandle.bind(this, 9)}></ButtonCal>
             </View>
             <View style={styles.row}>
-              <ButtonCal value={4} onPress={inputHandle.bind(this, '4')}></ButtonCal>
-              <ButtonCal value={5} onPress={inputHandle.bind(this, '5')}></ButtonCal>
-              <ButtonCal value={6} onPress={inputHandle.bind(this, '6')}></ButtonCal>
+              <ButtonCal value={4} onPress={inputHandle.bind(this, 4)}></ButtonCal>
+              <ButtonCal value={5} onPress={inputHandle.bind(this, 5)}></ButtonCal>
+              <ButtonCal value={6} onPress={inputHandle.bind(this, 6)}></ButtonCal>
             </View>
             <View style={styles.row}>
-              <ButtonCal value={1} onPress={inputHandle.bind(this, '1')}></ButtonCal>
-              <ButtonCal value={2} onPress={inputHandle.bind(this, '2')}></ButtonCal>
-              <ButtonCal value={3} onPress={inputHandle.bind(this, '3')}></ButtonCal>
+              <ButtonCal value={1} onPress={inputHandle.bind(this, 1)}></ButtonCal>
+              <ButtonCal value={2} onPress={inputHandle.bind(this, 2)}></ButtonCal>
+              <ButtonCal value={3} onPress={inputHandle.bind(this, 3)}></ButtonCal>
             </View>
             <View style={styles.row}>
-              <ButtonCal style={{flex:2}} value={0} onPress={inputHandle.bind(this, '0')}></ButtonCal>
+              <ButtonCal style={{flex:2}} value={0} onPress={inputHandle.bind(this, 0)}></ButtonCal>
               <ButtonCal value={'.'} onPress={inputHandle.bind(this, '.')}></ButtonCal>
             </View>
           </View>
